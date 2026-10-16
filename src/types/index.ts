@@ -8,16 +8,52 @@ export type UserRole =
 
 export type CreditTerms = 'none' | 'net_15' | 'net_30';
 
+export type StaffCapability =
+  | 'super_admin'
+  | 'finance_billing'
+  | 'sales_rep'
+  | 'warehouse_lead'
+  | 'fleet_dispatch'
+  | 'driver';
+
 export interface UserProfile {
   id: string;
   email: string;
   name: string;
   role: UserRole;
+  capabilities?: StaffCapability[];
+  department?: string;
+  phone?: string;
   clientAccountId?: string;
   pinHash?: string;
   pinLastAuthAt?: string;
   isActive: boolean;
   createdAt: string;
+}
+
+export interface InboundRestockRecord {
+  id: string;
+  productId: string;
+  productName: string;
+  sku: string;
+  quantityReceived: number;
+  supplierName: string;
+  poNumber: string;
+  batchNumber?: string;
+  receivedByUserName: string;
+  warehouseLocation: string;
+  createdAt: string;
+}
+
+export interface DispatchAssignment {
+  orderId: string;
+  orderNumber: string;
+  clientCompanyName: string;
+  driverId: string;
+  driverName: string;
+  truckId: string;
+  stopSequence: number;
+  dispatchedAt: string;
 }
 
 export interface ClientAccount {

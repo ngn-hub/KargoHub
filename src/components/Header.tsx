@@ -167,7 +167,37 @@ export default function Header({ activeTab, setActiveTab, onOpenCart }: HeaderPr
                       : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
                   }`}
                 >
-                  Client Directory & Invites
+                  Clients & Invites
+                </button>
+                <button
+                  onClick={() => setActiveTab("admin-finance")}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                    activeTab === "admin-finance"
+                      ? "bg-white text-purple-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                  }`}
+                >
+                  Finance & AR
+                </button>
+                <button
+                  onClick={() => setActiveTab("admin-dispatch")}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                    activeTab === "admin-dispatch"
+                      ? "bg-white text-purple-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                  }`}
+                >
+                  Fleet Dispatch
+                </button>
+                <button
+                  onClick={() => setActiveTab("admin-staff")}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                    activeTab === "admin-staff"
+                      ? "bg-white text-purple-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                  }`}
+                >
+                  Staff & Roles
                 </button>
               </>
             )}
@@ -311,6 +341,24 @@ export default function Header({ activeTab, setActiveTab, onOpenCart }: HeaderPr
                 className={`py-1 px-3 rounded-lg font-semibold ${activeTab === "admin-clients" ? "bg-purple-50 text-purple-700 border border-purple-200 font-bold" : "text-slate-600"}`}
               >
                 Clients
+              </button>
+              <button
+                onClick={() => setActiveTab("admin-finance")}
+                className={`py-1 px-3 rounded-lg font-semibold ${activeTab === "admin-finance" ? "bg-purple-50 text-purple-700 border border-purple-200 font-bold" : "text-slate-600"}`}
+              >
+                Finance
+              </button>
+              <button
+                onClick={() => setActiveTab("admin-dispatch")}
+                className={`py-1 px-3 rounded-lg font-semibold ${activeTab === "admin-dispatch" ? "bg-purple-50 text-purple-700 border border-purple-200 font-bold" : "text-slate-600"}`}
+              >
+                Dispatch
+              </button>
+              <button
+                onClick={() => setActiveTab("admin-staff")}
+                className={`py-1 px-3 rounded-lg font-semibold ${activeTab === "admin-staff" ? "bg-purple-50 text-purple-700 border border-purple-200 font-bold" : "text-slate-600"}`}
+              >
+                Staff
               </button>
             </>
           )}

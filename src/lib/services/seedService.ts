@@ -6,8 +6,55 @@ export const DEMO_USERS: UserProfile[] = [
   {
     id: "usr-admin-01",
     email: "admin@kargohub.com",
-    name: "Arthur Pendelton (Admin Owner)",
+    name: "Arthur Pendelton (Owner / GM)",
     role: "admin",
+    capabilities: ["super_admin", "finance_billing", "sales_rep"],
+    department: "Executive Management",
+    phone: "+1 (555) 901-2200",
+    isActive: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "usr-finance-01",
+    email: "finance@kargohub.com",
+    name: "Eleanor Vance (AR & Credit Controller)",
+    role: "admin",
+    capabilities: ["finance_billing"],
+    department: "Finance & Accounts Receivable",
+    phone: "+1 (555) 901-2244",
+    isActive: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "usr-sales-01",
+    email: "sales.carlos@kargohub.com",
+    name: "Carlos Gomez (Senior Wholesale Rep)",
+    role: "sales_rep",
+    capabilities: ["sales_rep"],
+    department: "Commercial Sales & Accounts",
+    phone: "+1 (555) 901-2288",
+    isActive: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "usr-warehouse-01",
+    email: "warehouse@kargohub.com",
+    name: "Marcus Vance (Warehouse & Dispatch Lead)",
+    role: "warehouse",
+    capabilities: ["warehouse_lead", "fleet_dispatch"],
+    department: "Fulfillment & Inbound Logistics",
+    phone: "+1 (555) 901-2211",
+    isActive: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "usr-driver-01",
+    email: "driver.alex@kargohub.com",
+    name: "Alex Mercer (Fleet Route Driver)",
+    role: "driver",
+    capabilities: ["driver"],
+    department: "Fleet Logistics (Truck #14)",
+    phone: "+1 (555) 901-2299",
     isActive: true,
     createdAt: new Date().toISOString()
   },
@@ -17,6 +64,8 @@ export const DEMO_USERS: UserProfile[] = [
     name: "Sarah Chen (Metro Supermarket Owner)",
     role: "client_owner",
     clientAccountId: "client-metro-supermarket",
+    department: "Client Procurement",
+    phone: "+1 (555) 349-8812",
     isActive: true,
     createdAt: new Date().toISOString()
   },
@@ -26,22 +75,8 @@ export const DEMO_USERS: UserProfile[] = [
     name: "David Kim (Metro Purchasing Staff)",
     role: "client_staff",
     clientAccountId: "client-metro-supermarket",
-    isActive: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: "usr-warehouse-01",
-    email: "warehouse@kargohub.com",
-    name: "Marcus Vance (Warehouse Lead)",
-    role: "warehouse",
-    isActive: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: "usr-driver-01",
-    email: "driver.alex@kargohub.com",
-    name: "Alex Mercer (Fleet Route Driver)",
-    role: "driver",
+    department: "Store Order Desk",
+    phone: "+1 (555) 349-8813",
     isActive: true,
     createdAt: new Date().toISOString()
   }

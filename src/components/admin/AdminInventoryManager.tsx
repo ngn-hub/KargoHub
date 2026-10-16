@@ -25,8 +25,10 @@ import {
   Tag
 } from "lucide-react";
 import { DEMO_PRODUCTS } from "@/lib/services/seedService";
-import { getInitialInventory, getStoredProducts, saveStoredProducts } from "@/lib/services/storeSync";
+import { getInitialInventory, getStoredProducts, saveStoredProducts, getStoredRestocks, saveStoredRestocks } from "@/lib/services/storeSync";
 import { compressPaymentSlip } from "@/lib/utils/imageCompressor";
+import InboundRestockModal from "./InboundRestockModal";
+import { InboundRestockRecord } from "@/types";
 
 const PRESET_CATEGORIES = [
   "Beverages",
@@ -84,6 +86,7 @@ export default function AdminInventoryManager() {
   const [formData, setFormData] = useState<ProductFormData>(DEFAULT_FORM);
   const [isCompressing, setIsCompressing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRestockOpen, setIsRestockOpen] = useState(false);
 
   // Fast inline edit fallback
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -91,6 +94,40 @@ export default function AdminInventoryManager() {
   const [editStockOnHand, setEditStockOnHand] = useState<number>(0);
   const [notice, setNotice] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleConfirmRestock = async (record: InboundRestockRecord) => {
+    const warehouseId = "wh-central-01";
+    const currentInv = inventoryMap[record.productId];
+    const newOnHand = (currentInv ? currentInv.qtyOnHand : 0) + record.quantityReceived;
+
+    const updatedInv: InventoryItem = {
+      productId: record.productId,
+      warehouseId,
+      warehouseName: "Central Fulfillment Hub (Bay A)",
+      qtyOnHand: newOnHand,
+      qtyReserved: currentInv ? currentInv.qtyReserved : 0
+    };
+
+    try {
+      await setDoc(doc(db, "inventory", `${record.productId}_${warehouseId}`), updatedInv, { merge: true });
+    } catch {}
+
+    setInventoryMap((prev) => ({
+      ...prev,
+      [record.productId]: updatedInv
+    }));
+
+    const restocks = [record, ...getStoredRestocks()];
+    saveStoredRestocks(restocks);
+
+    setNotice(`Intake confirmed: Added +${record.quantityReceived} ${selectedProductUnit(record.productId)} of ${record.productName} (PO: ${record.poNumber})!`);
+    setTimeout(() => setNotice(null), 4000);
+  };
+
+  const selectedProductUnit = (id: string) => {
+    const p = products.find((prod) => prod.id === id);
+    return p ? `${p.unit}s` : "units";
+  };
 
   // 1. Live subscribe to products
   useEffect(() => {
@@ -303,6 +340,13 @@ export default function AdminInventoryManager() {
         </div>
 
         <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setIsRestockOpen(true)}
+            className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-sm shadow-amber-600/20 flex items-center gap-2 transition-all hover:scale-105"
+          >
+            <Boxes className="w-4 h-4" />
+            <span>Receive Supplier Stock</span>
+          </button>
           <button
             onClick={handleOpenCreate}
             className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm shadow-blue-600/20 flex items-center gap-2 transition-all hover:scale-105"
@@ -752,6 +796,14 @@ export default function AdminInventoryManager() {
           </div>
         </div>
       )}
+
+      {/* INBOUND SUPPLIER RESTOCK INTAKE MODAL */}
+      <InboundRestockModal
+        isOpen={isRestockOpen}
+        onClose={() => setIsRestockOpen(false)}
+        products={products}
+        onConfirmRestock={handleConfirmRestock}
+      />
     </div>
   );
 }

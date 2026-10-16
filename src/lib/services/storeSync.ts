@@ -218,3 +218,68 @@ export function saveStoredClients(clients: import("@/types").ClientAccount[]) {
     console.warn("Could not save clients to localStorage", e);
   }
 }
+
+import { DEMO_USERS } from "./seedService";
+import { UserProfile, InboundRestockRecord, DispatchAssignment } from "@/types";
+
+export function getStoredUsers(): UserProfile[] {
+  if (typeof window === "undefined") return DEMO_USERS;
+  try {
+    const raw = localStorage.getItem("kargohub_staff_users");
+    if (raw) return JSON.parse(raw);
+    localStorage.setItem("kargohub_staff_users", JSON.stringify(DEMO_USERS));
+    return DEMO_USERS;
+  } catch {
+    return DEMO_USERS;
+  }
+}
+
+export function saveStoredUsers(users: UserProfile[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("kargohub_staff_users", JSON.stringify(users));
+  } catch (e) {
+    console.warn("Could not save staff to localStorage", e);
+  }
+}
+
+export function getStoredRestocks(): InboundRestockRecord[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem("kargohub_restocks");
+    if (raw) return JSON.parse(raw);
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveStoredRestocks(restocks: InboundRestockRecord[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("kargohub_restocks", JSON.stringify(restocks));
+  } catch (e) {
+    console.warn("Could not save restocks to localStorage", e);
+  }
+}
+
+export function getStoredDispatches(): DispatchAssignment[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem("kargohub_dispatches");
+    if (raw) return JSON.parse(raw);
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveStoredDispatches(dispatches: DispatchAssignment[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("kargohub_dispatches", JSON.stringify(dispatches));
+  } catch (e) {
+    console.warn("Could not save dispatches to localStorage", e);
+  }
+}
+

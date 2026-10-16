@@ -10,6 +10,9 @@ import AdminFulfillmentHub from "@/components/admin/AdminFulfillmentHub";
 import AdminInventoryManager from "@/components/admin/AdminInventoryManager";
 import AdminPricingMatrix from "@/components/admin/AdminPricingMatrix";
 import AdminClientManager from "@/components/admin/AdminClientManager";
+import AdminFinanceManager from "@/components/admin/AdminFinanceManager";
+import AdminDispatchManager from "@/components/admin/AdminDispatchManager";
+import AdminStaffManager from "@/components/admin/AdminStaffManager";
 import WarehouseView from "@/components/warehouse/WarehouseView";
 import DriverDeliveryView from "@/components/driver/DriverDeliveryView";
 import { db } from "@/lib/firebase/config";
@@ -112,6 +115,9 @@ export default function HomePage() {
         {activeTab === "admin-inventory" && <AdminInventoryManager />}
         {activeTab === "admin-pricing" && <AdminPricingMatrix />}
         {activeTab === "admin-clients" && <AdminClientManager />}
+        {activeTab === "admin-finance" && <AdminFinanceManager />}
+        {activeTab === "admin-dispatch" && <AdminDispatchManager />}
+        {activeTab === "admin-staff" && <AdminStaffManager />}
         {activeTab === "warehouse" && <WarehouseView />}
         {activeTab === "driver" && <DriverDeliveryView />}
       </main>
