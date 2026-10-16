@@ -9,6 +9,7 @@ import CartModal from "@/components/client/CartModal";
 import AdminFulfillmentHub from "@/components/admin/AdminFulfillmentHub";
 import AdminInventoryManager from "@/components/admin/AdminInventoryManager";
 import AdminPricingMatrix from "@/components/admin/AdminPricingMatrix";
+import AdminClientManager from "@/components/admin/AdminClientManager";
 import WarehouseView from "@/components/warehouse/WarehouseView";
 import DriverDeliveryView from "@/components/driver/DriverDeliveryView";
 import { db } from "@/lib/firebase/config";
@@ -110,6 +111,7 @@ export default function HomePage() {
         {activeTab === "admin-orders" && <AdminFulfillmentHub />}
         {activeTab === "admin-inventory" && <AdminInventoryManager />}
         {activeTab === "admin-pricing" && <AdminPricingMatrix />}
+        {activeTab === "admin-clients" && <AdminClientManager />}
         {activeTab === "warehouse" && <WarehouseView />}
         {activeTab === "driver" && <DriverDeliveryView />}
       </main>

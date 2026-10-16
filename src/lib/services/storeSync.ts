@@ -175,3 +175,46 @@ export function saveStoredOrders(orders: Order[]) {
     console.warn("Could not save to localStorage", e);
   }
 }
+
+export function getStoredProducts(): Product[] {
+  if (typeof window === "undefined") return DEMO_PRODUCTS;
+  try {
+    const raw = localStorage.getItem("kargohub_products");
+    if (raw) return JSON.parse(raw);
+    localStorage.setItem("kargohub_products", JSON.stringify(DEMO_PRODUCTS));
+    return DEMO_PRODUCTS;
+  } catch {
+    return DEMO_PRODUCTS;
+  }
+}
+
+export function saveStoredProducts(products: Product[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("kargohub_products", JSON.stringify(products));
+  } catch (e) {
+    console.warn("Could not save products to localStorage", e);
+  }
+}
+
+import { DEMO_CLIENTS } from "./seedService";
+export function getStoredClients(): import("@/types").ClientAccount[] {
+  if (typeof window === "undefined") return DEMO_CLIENTS;
+  try {
+    const raw = localStorage.getItem("kargohub_clients");
+    if (raw) return JSON.parse(raw);
+    localStorage.setItem("kargohub_clients", JSON.stringify(DEMO_CLIENTS));
+    return DEMO_CLIENTS;
+  } catch {
+    return DEMO_CLIENTS;
+  }
+}
+
+export function saveStoredClients(clients: import("@/types").ClientAccount[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("kargohub_clients", JSON.stringify(clients));
+  } catch (e) {
+    console.warn("Could not save clients to localStorage", e);
+  }
+}

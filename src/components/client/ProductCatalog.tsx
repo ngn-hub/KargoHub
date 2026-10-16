@@ -24,13 +24,13 @@ import {
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { DEMO_PRODUCTS } from "@/lib/services/seedService";
-import { getInitialInventory, getInitialTierItems, getInitialOverrides, getStoredOrders } from "@/lib/services/storeSync";
+import { getInitialInventory, getInitialTierItems, getInitialOverrides, getStoredOrders, getStoredProducts } from "@/lib/services/storeSync";
 
 export default function ProductCatalog() {
   const { currentClient, currentUser } = useAuth();
   const { addToCart, loadOrderIntoCart } = useCart();
 
-  const [products, setProducts] = useState<Product[]>(DEMO_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>(() => getStoredProducts());
   const [inventoryMap, setInventoryMap] = useState<Record<string, InventoryItem>>(getInitialInventory());
   const [tierItemsMap, setTierItemsMap] = useState<Record<string, PriceListItem>>(getInitialTierItems());
   const [overridesMap, setOverridesMap] = useState<Record<string, ClientPriceOverride>>(getInitialOverrides());
@@ -39,7 +39,7 @@ export default function ProductCatalog() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [quantities, setQuantities] = useState<Record<string, number>>(() => {
     const q: Record<string, number> = {};
-    DEMO_PRODUCTS.forEach((p) => {
+    getStoredProducts().forEach((p) => {
       q[p.id] = p.moq;
     });
     return q;
@@ -54,13 +54,12 @@ export default function ProductCatalog() {
           const items = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Product));
           setProducts(items);
         }
-      }, (err) => {
-        // Firestore permission/disabled - fallback to local demo products
-        console.info("Using local demo catalog cache.");
+      }, () => {
+        setProducts(getStoredProducts());
       });
       return () => unsub();
     } catch {
-      // offline fallback
+      setProducts(getStoredProducts());
     }
   }, []);
 

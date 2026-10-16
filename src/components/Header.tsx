@@ -159,6 +159,16 @@ export default function Header({ activeTab, setActiveTab, onOpenCart }: HeaderPr
                 >
                   Tier Pricing Matrix
                 </button>
+                <button
+                  onClick={() => setActiveTab("admin-clients")}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                    activeTab === "admin-clients"
+                      ? "bg-white text-purple-700 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                  }`}
+                >
+                  Client Directory & Invites
+                </button>
               </>
             )}
 
@@ -295,6 +305,12 @@ export default function Header({ activeTab, setActiveTab, onOpenCart }: HeaderPr
                 className={`py-1 px-3 rounded-lg font-semibold ${activeTab === "admin-pricing" ? "bg-purple-50 text-purple-700 border border-purple-200 font-bold" : "text-slate-600"}`}
               >
                 Tiers
+              </button>
+              <button
+                onClick={() => setActiveTab("admin-clients")}
+                className={`py-1 px-3 rounded-lg font-semibold ${activeTab === "admin-clients" ? "bg-purple-50 text-purple-700 border border-purple-200 font-bold" : "text-slate-600"}`}
+              >
+                Clients
               </button>
             </>
           )}
