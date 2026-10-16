@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { db } from "@/lib/firebase/config";
-import { collection, onSnapshot, query, where, doc, updateDoc, addDoc } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Order, OrderStatus } from "@/types";
 import { useAuth } from "@/context/AuthContext";
 import { formatCurrency } from "@/lib/utils/currency";
 import { transitionOrderStatus } from "@/lib/services/orderService";
+import InvoiceDocumentModal from "@/components/documents/InvoiceDocumentModal";
 import {
   FileText,
   Clock,
@@ -21,9 +22,11 @@ import {
   RotateCcw,
   ChevronRight,
   ShieldAlert,
-  Download
+  Printer,
+  Image,
+  Eye,
+  Trash2
 } from "lucide-react";
-
 import { getStoredOrders, saveStoredOrders } from "@/lib/services/storeSync";
 
 export default function OrderHistoryView() {
@@ -34,9 +37,15 @@ export default function OrderHistoryView() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(() => {
     return getStoredOrders()[0] || null;
   });
-  const [receiptUrl, setReceiptUrl] = useState("");
+
+  // State for Document Modal
+  const [activeDocType, setActiveDocType] = useState<"SO" | "INV" | "DR" | null>(null);
+
+  // File upload state
+  const [receiptImageFile, setReceiptImageFile] = useState<string | null>(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+  const [previewZoomImage, setPreviewZoomImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!currentClient?.id) return;
@@ -56,7 +65,6 @@ export default function OrderHistoryView() {
           }
         }
       }, () => {
-        // Fallback to local stored orders
         const local = getStoredOrders().filter((o) => o.clientAccountId === currentClient.id);
         setOrders(local);
         if (local.length > 0 && !selectedOrder) setSelectedOrder(local[0]);
@@ -67,7 +75,7 @@ export default function OrderHistoryView() {
     }
   }, [currentClient?.id]);
 
-  // Client self-cancellation (permitted only while in PLACED state per Section 4 Rule 3)
+  // Client self-cancellation
   const handleClientCancel = async (order: Order) => {
     if (order.status !== "PLACED") {
       alert("Self-cancellation is only permitted while order is in PLACED status.");
@@ -90,9 +98,21 @@ export default function OrderHistoryView() {
     }
   };
 
-  // Upload Bank Transfer Receipt simulation
-  const handleUploadReceipt = async (orderId: string) => {
-    if (!receiptUrl.trim()) return;
+  // Handle local file selection for payment proof
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setReceiptImageFile(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Submit proof of payment
+  const handleSubmitProof = async (orderId: string) => {
+    if (!receiptImageFile) return;
     setUploadingReceipt(true);
 
     const res = await transitionOrderStatus({
@@ -100,14 +120,14 @@ export default function OrderHistoryView() {
       toStatus: "PLACED",
       changedByUserId: currentUser.id,
       changedByName: currentUser.email,
-      proofImageUrl: receiptUrl.trim(),
-      reason: "Payment transfer receipt uploaded by client."
+      proofImageUrl: receiptImageFile,
+      reason: "Wire transfer payment receipt uploaded by client."
     });
 
     setUploadingReceipt(false);
     if (res.success) {
       setActionNotice("Receipt submitted! Admin will verify and confirm your order.");
-      setReceiptUrl("");
+      setReceiptImageFile(null);
       setTimeout(() => setActionNotice(null), 4000);
     }
   };
@@ -239,43 +259,99 @@ export default function OrderHistoryView() {
                   </p>
                 </div>
 
-                {/* Self-Cancel Action (Only in PLACED status) */}
-                {selectedOrder.status === "PLACED" && (
+                {/* Top Action Buttons: Print Documents & Self-Cancel */}
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleClientCancel(selectedOrder)}
-                    className="px-3 py-1.5 bg-red-950/60 hover:bg-red-900 text-red-200 border border-red-500/40 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
+                    onClick={() => setActiveDocType("SO")}
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
                   >
-                    <XCircle className="w-3.5 h-3.5 text-red-400" />
-                    <span>Cancel Order</span>
+                    <Printer className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Print Order</span>
                   </button>
-                )}
+
+                  {selectedOrder.status === "PLACED" && (
+                    <button
+                      onClick={() => handleClientCancel(selectedOrder)}
+                      className="px-3 py-1.5 bg-red-950/60 hover:bg-red-900 text-red-200 border border-red-500/40 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all"
+                    >
+                      <XCircle className="w-3.5 h-3.5 text-red-400" />
+                      <span>Cancel</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {/* Sequential Document Registry Badges */}
+              {/* Sequential Document Registry Badges (Click to Print/Download) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">
-                    Sales Order ID
-                  </span>
-                  <span className="text-xs font-mono font-bold text-white">
+                {/* Sales Order Button */}
+                <div
+                  onClick={() => setActiveDocType("SO")}
+                  className="p-3.5 bg-slate-950/60 border border-slate-800 hover:border-blue-500/60 rounded-xl cursor-pointer transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] uppercase font-bold text-slate-400">
+                      Sales Order ID
+                    </span>
+                    <Printer className="w-3 h-3 text-slate-500 group-hover:text-blue-400" />
+                  </div>
+                  <span className="text-xs font-mono font-bold text-white group-hover:text-blue-300">
                     {selectedOrder.orderNumber}
                   </span>
+                  <div className="text-[10px] text-blue-400 mt-1">Click to Print / Save PDF</div>
                 </div>
-                <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">
-                    Monotonic Invoice ID
-                  </span>
+
+                {/* Tax Invoice Button */}
+                <div
+                  onClick={() => {
+                    if (selectedOrder.invoiceNumber || selectedOrder.status !== "PLACED") {
+                      setActiveDocType("INV");
+                    }
+                  }}
+                  className={`p-3.5 rounded-xl border transition-all ${
+                    selectedOrder.invoiceNumber || selectedOrder.status !== "PLACED"
+                      ? "bg-slate-950/60 border-slate-800 hover:border-blue-500/60 cursor-pointer group"
+                      : "bg-slate-950/30 border-slate-800/40 opacity-60 cursor-not-allowed"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] uppercase font-bold text-slate-400">
+                      Commercial Tax Invoice
+                    </span>
+                    <Printer className="w-3 h-3 text-slate-500 group-hover:text-blue-400" />
+                  </div>
                   <span className="text-xs font-mono font-bold text-blue-400">
                     {selectedOrder.invoiceNumber || "Minted upon confirmation"}
                   </span>
+                  <div className="text-[10px] text-blue-400 mt-1">
+                    {selectedOrder.invoiceNumber ? "Click to Print / Save PDF" : "Pending Verification"}
+                  </div>
                 </div>
-                <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">
-                    Delivery Receipt
-                  </span>
+
+                {/* Delivery Receipt Button */}
+                <div
+                  onClick={() => {
+                    if (selectedOrder.status === "DELIVERED") {
+                      setActiveDocType("DR");
+                    }
+                  }}
+                  className={`p-3.5 rounded-xl border transition-all ${
+                    selectedOrder.status === "DELIVERED"
+                      ? "bg-slate-950/60 border-slate-800 hover:border-emerald-500/60 cursor-pointer group"
+                      : "bg-slate-950/30 border-slate-800/40 opacity-60 cursor-not-allowed"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] uppercase font-bold text-slate-400">
+                      Signed Delivery Receipt
+                    </span>
+                    <Printer className="w-3 h-3 text-slate-500 group-hover:text-emerald-400" />
+                  </div>
                   <span className="text-xs font-mono font-bold text-emerald-400">
                     {selectedOrder.deliveryReceiptNumber || "Minted upon delivery"}
                   </span>
+                  <div className="text-[10px] text-emerald-400 mt-1">
+                    {selectedOrder.status === "DELIVERED" ? "Click to View Signed POD" : "Awaiting Fleet Delivery"}
+                  </div>
                 </div>
               </div>
 
@@ -319,19 +395,19 @@ export default function OrderHistoryView() {
                 </div>
               </div>
 
-              {/* Bank Transfer Receipt Upload Widget (KargoHub.md Screen 6) */}
+              {/* Enhanced Bank Transfer Receipt Upload & Proof Management (Section 6.1 Screen 6) */}
               {selectedOrder.paymentMethod === "transfer" && (
-                <div className="p-5 bg-gradient-to-r from-blue-950/30 to-indigo-950/30 border border-blue-500/30 rounded-xl space-y-3">
+                <div className="p-5 bg-gradient-to-r from-blue-950/30 to-indigo-950/30 border border-blue-500/30 rounded-xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Building className="w-5 h-5 text-blue-400" />
                       <h4 className="text-sm font-semibold text-white">
-                        Bank Transfer Settlement & Receipt Verification
+                        Bank Transfer Proof & Verification
                       </h4>
                     </div>
                     {selectedOrder.paymentStatus === "verified" ? (
                       <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4" /> Verified by Admin
+                        <CheckCircle2 className="w-4 h-4" /> Verified by Accounting
                       </span>
                     ) : selectedOrder.proofImageUrl ? (
                       <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
@@ -339,7 +415,7 @@ export default function OrderHistoryView() {
                       </span>
                     ) : (
                       <span className="text-xs font-bold text-red-400 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" /> Proof Required (48h Timer Active)
+                        <AlertCircle className="w-4 h-4" /> Proof Required (48h Reservation Hold)
                       </span>
                     )}
                   </div>
@@ -348,39 +424,92 @@ export default function OrderHistoryView() {
                     Bank: <strong>KargoHub Treasury Chase</strong> · Account: <strong>8829-4100-3918</strong> · Routing: <strong>021000021</strong>
                   </p>
 
-                  {/* Upload input */}
-                  {selectedOrder.paymentStatus !== "verified" && (
-                    <div className="flex items-center gap-2 pt-1">
-                      <input
-                        type="text"
-                        placeholder="Paste wire receipt image URL or transaction ref..."
-                        value={receiptUrl}
-                        onChange={(e) => setReceiptUrl(e.target.value)}
-                        className="flex-1 bg-slate-950 border border-slate-800 text-xs text-white p-2.5 rounded-xl focus:border-blue-500 focus:outline-none"
-                      />
+                  {/* Existing Uploaded Proof Preview */}
+                  {selectedOrder.proofImageUrl && (
+                    <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          onClick={() => setPreviewZoomImage(selectedOrder.proofImageUrl!)}
+                          className="w-16 h-16 rounded-lg overflow-hidden border border-slate-700 bg-slate-900 cursor-pointer shrink-0 hover:opacity-80 transition-opacity"
+                        >
+                          <img
+                            src={selectedOrder.proofImageUrl}
+                            alt="Payment Proof"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-white flex items-center gap-1">
+                            <FileCheck className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Payment Slip Uploaded</span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 mt-0.5">
+                            Click thumbnail to inspect full resolution.
+                          </p>
+                        </div>
+                      </div>
+
                       <button
-                        onClick={() => handleUploadReceipt(selectedOrder.id)}
-                        disabled={uploadingReceipt || !receiptUrl.trim()}
-                        className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all"
+                        onClick={() => setPreviewZoomImage(selectedOrder.proofImageUrl!)}
+                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-lg flex items-center gap-1"
                       >
-                        <UploadCloud className="w-4 h-4" />
-                        <span>Submit Receipt</span>
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Inspect</span>
                       </button>
                     </div>
                   )}
 
-                  {selectedOrder.proofImageUrl && (
-                    <div className="text-xs text-slate-400 flex items-center gap-2 pt-1">
-                      <FileCheck className="w-4 h-4 text-emerald-400" />
-                      <span>Receipt Attached: </span>
-                      <a
-                        href={selectedOrder.proofImageUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-400 underline font-mono truncate max-w-xs"
-                      >
-                        {selectedOrder.proofImageUrl}
-                      </a>
+                  {/* Drag-and-Drop / File Input Widget if not verified */}
+                  {selectedOrder.paymentStatus !== "verified" && (
+                    <div className="space-y-3 pt-1">
+                      <div className="relative border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-xl p-5 text-center bg-slate-950/40 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <UploadCloud className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                        <div className="text-xs font-bold text-white">
+                          Click or drag wire transfer screenshot / slip here
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-1">
+                          Supports PNG, JPEG, WebP (Camera photos or banking app screenshots)
+                        </p>
+                      </div>
+
+                      {/* Staged file preview */}
+                      {receiptImageFile && (
+                        <div className="p-3 bg-slate-950/80 border border-blue-500/40 rounded-xl flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={receiptImageFile}
+                              alt="Staged Preview"
+                              className="w-12 h-12 rounded object-cover border border-slate-700"
+                            />
+                            <div className="text-xs">
+                              <span className="font-semibold text-white block">Selected Image Ready</span>
+                              <span className="text-[10px] text-emerald-400">Ready to submit to accounting</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setReceiptImageFile(null)}
+                              className="p-1.5 text-slate-400 hover:text-red-400"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleSubmitProof(selectedOrder.id)}
+                              disabled={uploadingReceipt}
+                              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg shadow-md flex items-center gap-1.5"
+                            >
+                              {uploadingReceipt ? "Submitting..." : "Confirm & Send Proof"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -389,9 +518,18 @@ export default function OrderHistoryView() {
               {/* Driver Proof of Delivery (if Delivered) */}
               {selectedOrder.status === "DELIVERED" && selectedOrder.driverSignatureUrl && (
                 <div className="p-4 bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Proof of Delivery & Digital Signature
-                  </h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Proof of Delivery & Digital Signature
+                    </h4>
+                    <button
+                      onClick={() => setActiveDocType("DR")}
+                      className="text-xs text-emerald-400 underline font-semibold flex items-center gap-1"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span>Print Signed POD</span>
+                    </button>
+                  </div>
                   <div className="flex items-center gap-4">
                     <div className="bg-slate-950 p-2 rounded-lg border border-slate-800">
                       <img
@@ -419,6 +557,37 @@ export default function OrderHistoryView() {
           )}
         </div>
       </div>
+
+      {/* Printable PDF Document Modal */}
+      {selectedOrder && activeDocType && (
+        <InvoiceDocumentModal
+          order={selectedOrder}
+          client={currentClient}
+          docType={activeDocType}
+          isOpen={!!activeDocType}
+          onClose={() => setActiveDocType(null)}
+        />
+      )}
+
+      {/* Full-screen Receipt Zoom Modal */}
+      {previewZoomImage && (
+        <div
+          onClick={() => setPreviewZoomImage(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md cursor-pointer animate-fade-in"
+        >
+          <div className="relative max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-hidden">
+            <div className="flex justify-between items-center pb-2 mb-2 border-b border-slate-800 text-xs text-white font-bold">
+              <span>Payment Proof High-Res Zoom</span>
+              <span className="text-slate-400 font-normal">Click anywhere to close</span>
+            </div>
+            <img
+              src={previewZoomImage}
+              alt="Zoomed Payment Slip"
+              className="max-h-[75vh] w-full object-contain rounded-lg"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

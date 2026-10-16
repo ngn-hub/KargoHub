@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { db } from "@/lib/firebase/config";
-import { collection, onSnapshot, query, orderBy, doc, getDocs, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Order, OrderStatus, OrderStatusHistory } from "@/types";
 import { useAuth } from "@/context/AuthContext";
 import { formatCurrency } from "@/lib/utils/currency";
 import { transitionOrderStatus } from "@/lib/services/orderService";
+import InvoiceDocumentModal from "@/components/documents/InvoiceDocumentModal";
 import {
   ShieldCheck,
   CheckCircle2,
@@ -23,9 +24,10 @@ import {
   TrendingUp,
   Building,
   Check,
-  Ban
+  Ban,
+  Printer,
+  FileCheck
 } from "lucide-react";
-
 import { getStoredOrders, saveStoredOrders } from "@/lib/services/storeSync";
 
 export default function AdminFulfillmentHub() {
@@ -37,6 +39,11 @@ export default function AdminFulfillmentHub() {
   const [actionNotice, setActionNotice] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
+
+  // Document modal state
+  const [activeDocType, setActiveDocType] = useState<"SO" | "INV" | "DR" | null>(null);
+  // Full-screen image zoom modal
+  const [previewZoomImage, setPreviewZoomImage] = useState<string | null>(null);
 
   // 1. Live subscribe to all orders
   useEffect(() => {
@@ -344,6 +351,15 @@ export default function AdminFulfillmentHub() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
+                  {/* Print Document Button */}
+                  <button
+                    onClick={() => setActiveDocType(selectedOrder.invoiceNumber ? "INV" : "SO")}
+                    className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-blue-400" />
+                    <span>{selectedOrder.invoiceNumber ? "Print Invoice" : "Print Order"}</span>
+                  </button>
+
                   {selectedOrder.status !== "CANCELLED" && selectedOrder.status !== "DELIVERED" && (
                     <button
                       onClick={() => setShowCancelModal(true)}
@@ -403,19 +419,38 @@ export default function AdminFulfillmentHub() {
                   )}
                 </div>
 
-                {/* Bank transfer receipt inspect if submitted */}
+                {/* Enhanced Bank Transfer Payment Slip Review Card */}
                 {selectedOrder.proofImageUrl && (
-                  <div className="pt-2 text-xs text-slate-300 flex items-center gap-2">
-                    <Eye className="w-4 h-4 text-blue-400" />
-                    <span>Client Uploaded Receipt:</span>
-                    <a
-                      href={selectedOrder.proofImageUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-blue-400 underline font-mono truncate max-w-xs"
+                  <div className="mt-3 p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        onClick={() => setPreviewZoomImage(selectedOrder.proofImageUrl!)}
+                        className="w-14 h-14 rounded-lg overflow-hidden border border-blue-500/40 bg-slate-900 cursor-pointer shrink-0 hover:scale-105 transition-transform"
+                      >
+                        <img
+                          src={selectedOrder.proofImageUrl}
+                          alt="Payment Slip"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white flex items-center gap-1">
+                          <FileCheck className="w-3.5 h-3.5 text-blue-400" />
+                          <span>Wire Transfer Receipt Attached</span>
+                        </div>
+                        <span className="text-[11px] text-slate-400">
+                          Target: {formatCurrency(selectedOrder.totalAmountCents)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setPreviewZoomImage(selectedOrder.proofImageUrl!)}
+                      className="px-3 py-1.5 bg-blue-600/30 hover:bg-blue-600 text-blue-200 hover:text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors"
                     >
-                      {selectedOrder.proofImageUrl}
-                    </a>
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Zoom / Inspect</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -463,6 +498,36 @@ export default function AdminFulfillmentHub() {
           )}
         </div>
       </div>
+
+      {/* Printable PDF Document Modal */}
+      {selectedOrder && activeDocType && (
+        <InvoiceDocumentModal
+          order={selectedOrder}
+          docType={activeDocType}
+          isOpen={!!activeDocType}
+          onClose={() => setActiveDocType(null)}
+        />
+      )}
+
+      {/* Admin Full-screen Receipt Zoom Modal */}
+      {previewZoomImage && (
+        <div
+          onClick={() => setPreviewZoomImage(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md cursor-pointer animate-fade-in"
+        >
+          <div className="relative max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-hidden">
+            <div className="flex justify-between items-center pb-2 mb-2 border-b border-slate-800 text-xs text-white font-bold">
+              <span>Inspect Wire Transfer Receipt Slip</span>
+              <span className="text-slate-400 font-normal">Click anywhere to close</span>
+            </div>
+            <img
+              src={previewZoomImage}
+              alt="Zoomed Payment Slip"
+              className="max-h-[75vh] w-full object-contain rounded-lg"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Admin Cancellation Reason Modal */}
       {showCancelModal && selectedOrder && (
