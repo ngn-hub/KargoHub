@@ -165,7 +165,7 @@ export default function DriverDeliveryView() {
 
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
-    ctx.strokeStyle = "#38bdf8"; // Light sky blue ink
+    ctx.strokeStyle = "#1d4ed8"; // Professional ballpoint ink
     ctx.lineTo(x, y);
     ctx.stroke();
   };
@@ -282,8 +282,8 @@ export default function DriverDeliveryView() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {notice && (
-        <div className="p-3 bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs font-semibold rounded-xl flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>{notice}</span>
         </div>
       )}
@@ -291,11 +291,11 @@ export default function DriverDeliveryView() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Truck className="w-5 h-5 text-emerald-400" />
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Truck className="w-5 h-5 text-emerald-600" />
             <span>Driver Route Manifest</span>
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Offline-resilient touch interface for dock receipt, COD collection, and digital signing.
           </p>
         </div>
@@ -305,14 +305,14 @@ export default function DriverDeliveryView() {
           <div
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
               isOnline
-                ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
-                : "bg-amber-950/60 border-amber-500/40 text-amber-300 animate-pulse"
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                : "bg-amber-50 border-amber-200 text-amber-800 animate-pulse"
             }`}
           >
             {isOnline ? (
-              <Wifi className="w-3 h-3 text-emerald-400" />
+              <Wifi className="w-3 h-3 text-emerald-600" />
             ) : (
-              <WifiOff className="w-3 h-3 text-amber-400" />
+              <WifiOff className="w-3 h-3 text-amber-600" />
             )}
             <span>{isOnline ? "Online Sync Active" : "Offline Mode (Local Cache)"}</span>
           </div>
@@ -321,7 +321,7 @@ export default function DriverDeliveryView() {
             <button
               onClick={handleManualSyncNow}
               disabled={isManualSyncing || !isOnline}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50 transition-colors shadow"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 transition-colors shadow-xs"
               title="Sync pending deliveries to Cloud Firestore"
             >
               <RefreshCw className={`w-3 h-3 ${isManualSyncing ? "animate-spin" : ""}`} />
@@ -329,17 +329,17 @@ export default function DriverDeliveryView() {
             </button>
           )}
 
-          <div className="text-xs font-semibold px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+          <div className="text-xs font-bold px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200">
             {orders.length} Stops
           </div>
         </div>
       </div>
 
       {orders.length === 0 ? (
-        <div className="py-20 bg-slate-900/60 border border-slate-800 rounded-2xl text-center space-y-3">
-          <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
-          <h3 className="text-base font-semibold text-white">All Route Deliveries Completed!</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <div className="py-20 bg-white border border-slate-200 rounded-2xl text-center space-y-3 shadow-xs">
+          <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900">All Route Deliveries Completed!</h3>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
             No orders currently staged in SHIPPED status. As warehouse packs orders, they will appear here.
           </p>
         </div>
@@ -347,7 +347,7 @@ export default function DriverDeliveryView() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Deliveries Tab Selection */}
           <div className="space-y-2.5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
               Assigned Stops
             </h3>
             {orders.map((ord, idx) => {
@@ -363,22 +363,22 @@ export default function DriverDeliveryView() {
                   }}
                   className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
                     isSelected
-                      ? "bg-emerald-600/10 border-emerald-500 shadow-md shadow-emerald-500/10"
-                      : "bg-slate-900/60 border-slate-800 hover:border-slate-700"
+                      ? "bg-emerald-50/80 border-emerald-500 ring-1 ring-emerald-500 shadow-xs"
+                      : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold font-mono text-white">
+                    <span className="text-xs font-bold font-mono text-slate-900">
                       Stop #{idx + 1}: {ord.orderNumber}
                     </span>
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
                       {ord.paymentMethod}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-200 font-semibold truncate">
+                  <div className="text-xs text-slate-800 font-bold truncate">
                     {ord.clientCompanyName}
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-1">
+                  <div className="text-[11px] text-slate-500 font-medium mt-1">
                     Total: {formatCurrency(ord.totalAmountCents)}
                   </div>
                 </div>
@@ -388,21 +388,21 @@ export default function DriverDeliveryView() {
 
           {/* Active Stop Details & Signature Pad */}
           {activeOrder && (
-            <div className="md:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-5">
+            <div className="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-xs">
               {/* Stop Info */}
-              <div className="flex items-start justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-start justify-between pb-4 border-b border-slate-200">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <Building className="w-4 h-4 text-emerald-400" />
-                    <h3 className="text-base font-bold text-white">
+                    <Building className="w-4 h-4 text-emerald-600" />
+                    <h3 className="text-base font-bold text-slate-900">
                       {activeOrder.clientCompanyName}
                     </h3>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-300">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-600">
                     <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span>4800 Industrial Blvd, Bay 4, Logistics City</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
                     <Phone className="w-3.5 h-3.5 text-slate-400" />
                     <span>+1 (555) 349-8812 (Receiving Desk)</span>
                   </div>
@@ -416,9 +416,9 @@ export default function DriverDeliveryView() {
                         );
                         window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, "_blank");
                       }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-[11px] font-semibold rounded-lg border border-slate-700 transition-colors shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-bold rounded-lg border border-slate-300 transition-colors shadow-xs"
                     >
-                      <Navigation className="w-3 h-3 text-emerald-400" />
+                      <Navigation className="w-3 h-3 text-emerald-600" />
                       <span>Launch GPS Directions</span>
                       <ExternalLink className="w-2.5 h-2.5 opacity-60 ml-0.5" />
                     </button>
@@ -426,8 +426,8 @@ export default function DriverDeliveryView() {
                 </div>
 
                 <div className="text-right">
-                  <span className="text-xs text-slate-400">Order Amount</span>
-                  <div className="text-xl font-bold text-white font-mono">
+                  <span className="text-xs text-slate-500 font-medium">Order Amount</span>
+                  <div className="text-xl font-bold text-slate-900 font-mono">
                     {formatCurrency(activeOrder.totalAmountCents)}
                   </div>
                 </div>
@@ -435,39 +435,39 @@ export default function DriverDeliveryView() {
 
               {/* COD Cash Collection Section if COD */}
               {activeOrder.paymentMethod === "cod" && (
-                <div className="p-4 bg-emerald-950/30 border border-emerald-500/40 rounded-xl space-y-2">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2 shadow-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-                      <Banknote className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+                      <Banknote className="w-4 h-4 text-emerald-600" />
                       <span>COD Cash Collection Required</span>
                     </span>
-                    <span className="text-xs font-bold text-emerald-400 font-mono">
+                    <span className="text-xs font-bold text-emerald-800 font-mono">
                       Target: {formatCurrency(activeOrder.totalAmountCents)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-400">Exact Cash Collected: $</span>
+                    <span className="text-xs text-slate-600 font-medium">Exact Cash Collected: $</span>
                     <input
                       type="number"
                       step="0.01"
                       value={codAmount}
                       onChange={(e) => setCodAmount(e.target.value)}
-                      className="bg-slate-950 border border-emerald-500/40 text-xs text-white p-2 rounded-lg w-32 font-bold"
+                      className="bg-white border border-slate-300 text-xs text-slate-900 p-2 rounded-lg w-32 font-bold shadow-xs focus:outline-none focus:border-emerald-500"
                     />
                   </div>
                 </div>
               )}
 
-              {/* Digital Signature Pad (HTML5 Canvas) */}
+              {/* Digital Signature Pad (HTML5 Canvas on White Surface) */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <PenTool className="w-3.5 h-3.5 text-blue-400" />
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                    <PenTool className="w-3.5 h-3.5 text-blue-600" />
                     <span>Receiver Digital Signature</span>
                   </label>
                   <button
                     onClick={clearSignature}
-                    className="text-xs text-slate-400 hover:text-white flex items-center gap-1"
+                    className="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 transition-colors"
                   >
                     <RotateCcw className="w-3 h-3" />
                     <span>Clear Pad</span>
@@ -475,7 +475,7 @@ export default function DriverDeliveryView() {
                 </div>
 
                 {/* Canvas */}
-                <div className="border border-slate-700/80 rounded-xl bg-slate-950 overflow-hidden shadow-inner touch-none">
+                <div className="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50/50 overflow-hidden shadow-inner touch-none">
                   <canvas
                     ref={canvasRef}
                     width={500}
@@ -487,7 +487,7 @@ export default function DriverDeliveryView() {
                     onTouchStart={startDrawing}
                     onTouchMove={draw}
                     onTouchEnd={stopDrawing}
-                    className="w-full h-40 cursor-crosshair"
+                    className="w-full h-40 cursor-crosshair bg-white"
                   />
                 </div>
                 <p className="text-[11px] text-slate-500 text-center italic">
@@ -499,7 +499,7 @@ export default function DriverDeliveryView() {
               <button
                 onClick={handleCompleteDelivery}
                 disabled={!hasSignature || completing}
-                className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-40 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
               >
                 {completing ? (
                   <span>Recording Delivery...</span>

@@ -62,7 +62,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Top Main Navigation */}
       <Header
         activeTab={activeTab}
@@ -71,34 +71,34 @@ export default function HomePage() {
       />
 
       {/* Role Context Bar */}
-      <div className="bg-slate-900/40 border-b border-slate-800/60 py-2.5 px-4 sm:px-8 text-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-slate-400">
+      <div className="bg-white border-b border-slate-200/80 py-2.5 px-4 sm:px-8 text-xs flex flex-wrap items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center gap-2 text-slate-600">
           <span className="flex h-2 w-2 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
           <span>
-            Active Persona: <strong className="text-white">{currentUser.name}</strong>
+            Active Persona: <strong className="text-slate-900 font-semibold">{currentUser.name}</strong>
           </span>
-          <span className="text-slate-600">|</span>
+          <span className="text-slate-300">|</span>
           <span>
-            Role: <strong className="text-blue-400 uppercase">{currentUser.role.replace("_", " ")}</strong>
+            Role: <strong className="text-blue-600 uppercase font-semibold">{currentUser.role.replace("_", " ")}</strong>
           </span>
           {currentClient && (
             <>
-              <span className="text-slate-600">|</span>
+              <span className="text-slate-300">|</span>
               <span>
-                Account: <strong className="text-white">{currentClient.companyName}</strong>
+                Account: <strong className="text-slate-900 font-semibold">{currentClient.companyName}</strong>
               </span>
-              <span className="text-slate-600">|</span>
+              <span className="text-slate-300">|</span>
               <span>
-                Terms: <strong className="text-amber-400 uppercase">{currentClient.creditTerms}</strong>
+                Terms: <strong className="text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">{currentClient.creditTerms}</strong>
               </span>
             </>
           )}
         </div>
 
-        <div className="text-[11px] text-slate-400 hidden sm:flex items-center gap-2">
+        <div className="text-[11px] text-slate-500 hidden sm:flex items-center gap-2">
           <span>Switch roles in the top-right dropdown to test fulfillment lifecycle end-to-end.</span>
         </div>
       </div>
@@ -155,13 +155,13 @@ export default function HomePage() {
         )}
 
       {/* Global Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-400">
+      <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-white tracking-tight">KargoHub</span>
+            <span className="font-bold text-slate-900 tracking-tight">KargoHub</span>
             <span>&copy; 2026 B2B Wholesale Ordering Platform</span>
           </div>
-          <div className="text-slate-400 text-[11px]">
+          <div className="text-slate-500 text-[11px]">
             Engineered with Next.js, Firebase Auth & Firestore Atomic Concurrency
           </div>
         </div>

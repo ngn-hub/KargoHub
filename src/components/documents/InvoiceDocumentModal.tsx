@@ -60,14 +60,14 @@ export default function InvoiceDocumentModal({
   const docInfo = getDocTitle();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
       {/* Container: Print style rules applied */}
-      <div className="relative w-full max-w-3xl bg-white text-slate-900 rounded-2xl shadow-2xl overflow-hidden my-8 flex flex-col print:m-0 print:w-full print:max-w-none print:shadow-none print:rounded-none">
+      <div className="relative w-full max-w-3xl bg-white text-slate-900 rounded-2xl shadow-2xl overflow-hidden my-8 flex flex-col border border-slate-200 print:border-none print:m-0 print:w-full print:max-w-none print:shadow-none print:rounded-none">
         {/* Top Control Bar (Hidden during printing) */}
-        <div className="flex items-center justify-between px-6 py-3.5 bg-slate-900 text-white print:hidden">
+        <div className="flex items-center justify-between px-6 py-3.5 bg-slate-100 border-b border-slate-200 text-slate-800 print:hidden">
           <div className="flex items-center gap-2">
-            <Package className="w-4 h-4 text-blue-400" />
-            <span className="text-xs font-bold font-mono tracking-wider">
+            <Package className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-bold font-mono tracking-wider text-slate-900">
               {docInfo.docNum}
             </span>
           </div>
@@ -75,14 +75,14 @@ export default function InvoiceDocumentModal({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5 transition-all hover:scale-105"
+              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs flex items-center gap-1.5 transition-all hover:scale-105"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print / Save PDF</span>
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+              className="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-200 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>

@@ -166,62 +166,62 @@ export default function AdminFulfillmentHub() {
   return (
     <div className="space-y-6">
       {actionNotice && (
-        <div className="p-3.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs font-semibold rounded-xl flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>{actionNotice}</span>
         </div>
       )}
 
       {/* EXECUTIVE KPI METRIC CARDS (KargoHub.md Section 6.2 Screen 1) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl flex items-center justify-between">
+        <div className="p-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-xs text-slate-400">Total Order Volume</span>
-            <div className="text-xl font-bold text-white mt-1">
+            <span className="text-xs text-slate-500 font-medium">Total Order Volume</span>
+            <div className="text-xl font-bold text-slate-900 mt-1">
               {formatCurrency(totalVolumeCents)}
             </div>
             <span className="text-[11px] text-slate-400 mt-0.5 block">{orders.length} lifetime orders</span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
             <TrendingUp className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl flex items-center justify-between">
+        <div className="p-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-xs text-slate-400">Receipts to Verify</span>
-            <div className="text-xl font-bold text-amber-400 mt-1">
+            <span className="text-xs text-slate-500 font-medium">Receipts to Verify</span>
+            <div className="text-xl font-bold text-amber-600 mt-1">
               {pendingReceiptsCount}
             </div>
             <span className="text-[11px] text-slate-400 mt-0.5 block">Unconfirmed Bank Transfers</span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
             <Clock className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl flex items-center justify-between">
+        <div className="p-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-xs text-slate-400">Warehouse Fulfillment</span>
-            <div className="text-xl font-bold text-purple-400 mt-1">
+            <span className="text-xs text-slate-500 font-medium">Warehouse Fulfillment</span>
+            <div className="text-xl font-bold text-purple-600 mt-1">
               {activePickingCount}
             </div>
             <span className="text-[11px] text-slate-400 mt-0.5 block">Picking & Packing Active</span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600">
             <Package className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl flex items-center justify-between">
+        <div className="p-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-between shadow-xs">
           <div>
-            <span className="text-xs text-slate-400">In-Transit Fleet</span>
-            <div className="text-xl font-bold text-cyan-400 mt-1">
+            <span className="text-xs text-slate-500 font-medium">In-Transit Fleet</span>
+            <div className="text-xl font-bold text-cyan-600 mt-1">
               {inTransitCount}
             </div>
             <span className="text-[11px] text-slate-400 mt-0.5 block">Out for Driver Delivery</span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+          <div className="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600">
             <Truck className="w-5 h-5" />
           </div>
         </div>
@@ -241,8 +241,8 @@ export default function AdminFulfillmentHub() {
             onClick={() => setFilterTab(tab.key)}
             className={`px-3 py-1.5 text-xs font-semibold rounded-xl whitespace-nowrap transition-all ${
               filterTab === tab.key
-                ? "bg-purple-600 text-white shadow-md shadow-purple-600/20"
-                : "bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800"
+                ? "bg-purple-600 text-white shadow-sm shadow-purple-600/20"
+                : "bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-slate-200"
             }`}
           >
             {tab.label}
@@ -253,17 +253,17 @@ export default function AdminFulfillmentHub() {
       {/* Main Fulfillment Grid: Order Master List & Detail Panel */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Left: Master Orders Table */}
-        <div className="w-full lg:w-3/5 bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
-          <div className="px-5 py-3 border-b border-slate-800 bg-slate-950/40 flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        <div className="w-full lg:w-3/5 bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+          <div className="px-5 py-3 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Orders Queue ({filteredOrders.length})
             </h3>
             <span className="text-xs text-slate-400">Click row to inspect audit trail</span>
           </div>
 
-          <div className="divide-y divide-slate-800/80 max-h-[70vh] overflow-y-auto">
+          <div className="divide-y divide-slate-100 max-h-[70vh] overflow-y-auto">
             {filteredOrders.length === 0 ? (
-              <div className="py-12 text-center text-slate-500 text-xs">
+              <div className="py-12 text-center text-slate-400 text-xs">
                 No orders match this filter.
               </div>
             ) : (
@@ -274,27 +274,27 @@ export default function AdminFulfillmentHub() {
                     key={ord.id}
                     onClick={() => setSelectedOrder(ord)}
                     className={`p-4 cursor-pointer transition-colors flex items-center justify-between gap-4 ${
-                      isSelected ? "bg-purple-950/30 border-l-4 border-purple-500" : "hover:bg-slate-850"
+                      isSelected ? "bg-purple-50/70 border-l-4 border-purple-600" : "hover:bg-slate-50"
                     }`}
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono text-xs font-bold text-white">
+                        <span className="font-mono text-xs font-bold text-slate-900">
                           #{ord.orderNumber}
                         </span>
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
                           {ord.paymentMethod}
                         </span>
                         {ord.invoiceNumber && (
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                             {ord.invoiceNumber}
                           </span>
                         )}
                       </div>
-                      <h4 className="text-xs font-semibold text-slate-200 truncate">
+                      <h4 className="text-xs font-semibold text-slate-800 truncate">
                         {ord.clientCompanyName}
                       </h4>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[11px] text-slate-500">
                         {new Date(ord.createdAt).toLocaleDateString()} · {formatCurrency(ord.totalAmountCents)}
                       </p>
                     </div>
@@ -304,12 +304,12 @@ export default function AdminFulfillmentHub() {
                       <span
                         className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
                           ord.status === "CONFIRMED"
-                            ? "bg-blue-900/60 text-blue-200 border-blue-500/40"
+                            ? "bg-blue-50 text-blue-700 border-blue-200"
                             : ord.status === "DELIVERED"
-                            ? "bg-emerald-900/60 text-emerald-200 border-emerald-500/40"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                             : ord.status === "CANCELLED"
-                            ? "bg-red-900/60 text-red-200 border-red-500/40"
-                            : "bg-amber-900/60 text-amber-200 border-amber-500/40"
+                            ? "bg-red-50 text-red-700 border-red-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200"
                         }`}
                       >
                         {ord.status}
@@ -322,7 +322,7 @@ export default function AdminFulfillmentHub() {
                             e.stopPropagation();
                             handleVerifyAndConfirm(ord);
                           }}
-                          className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-semibold rounded-lg shadow-sm flex items-center gap-1"
+                          className="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-semibold rounded-lg shadow-xs flex items-center gap-1 transition-colors"
                         >
                           <Check className="w-3 h-3" />
                           <span>Confirm</span>
@@ -337,33 +337,33 @@ export default function AdminFulfillmentHub() {
         </div>
 
         {/* Right: Selected Order Detail, Verification & Audit History */}
-        <div className="flex-1 w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-5">
+        <div className="flex-1 w-full bg-white border border-slate-200 rounded-2xl p-5 space-y-5 shadow-xs">
           {selectedOrder ? (
             <>
               {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                 <div>
-                  <h3 className="text-base font-bold text-white font-mono">
+                  <h3 className="text-base font-bold text-slate-900 font-mono">
                     Order #{selectedOrder.orderNumber}
                   </h3>
-                  <p className="text-xs text-slate-400">
-                    Client: <strong>{selectedOrder.clientCompanyName}</strong>
+                  <p className="text-xs text-slate-500">
+                    Client: <strong className="text-slate-800">{selectedOrder.clientCompanyName}</strong>
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   {/* Print Document Button */}
                   <button
                     onClick={() => setActiveDocType(selectedOrder.invoiceNumber ? "INV" : "SO")}
-                    className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all"
+                    className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all"
                   >
-                    <Printer className="w-3.5 h-3.5 text-blue-400" />
+                    <Printer className="w-3.5 h-3.5 text-blue-600" />
                     <span>{selectedOrder.invoiceNumber ? "Print Invoice" : "Print Order"}</span>
                   </button>
 
                   {selectedOrder.status !== "CANCELLED" && selectedOrder.status !== "DELIVERED" && (
                     <button
                       onClick={() => setShowCancelModal(true)}
-                      className="px-2.5 py-1.5 bg-red-950/60 hover:bg-red-900 text-red-200 border border-red-500/30 rounded-lg text-xs font-semibold flex items-center gap-1"
+                      className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
                     >
                       <Ban className="w-3.5 h-3.5" />
                       <span>Admin Cancel</span>
@@ -373,15 +373,15 @@ export default function AdminFulfillmentHub() {
               </div>
 
               {/* State Transition Actions */}
-              <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   Fulfillment Actions
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedOrder.status === "PLACED" && (
                     <button
                       onClick={() => handleVerifyAndConfirm(selectedOrder)}
-                      className="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-purple-600/20"
+                      className="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm shadow-purple-600/20 transition-all"
                     >
                       <CheckCircle2 className="w-4 h-4" />
                       <span>Verify Receipt & Mint Invoice (INV)</span>
@@ -391,7 +391,7 @@ export default function AdminFulfillmentHub() {
                   {selectedOrder.status === "CONFIRMED" && (
                     <button
                       onClick={() => handleAdvanceStatus(selectedOrder, "PICKING")}
-                      className="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-amber-600/20"
+                      className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm shadow-amber-600/20 transition-all"
                     >
                       <Package className="w-4 h-4" />
                       <span>Dispatch to Warehouse Picking</span>
@@ -401,7 +401,7 @@ export default function AdminFulfillmentHub() {
                   {selectedOrder.status === "PICKING" && (
                     <button
                       onClick={() => handleAdvanceStatus(selectedOrder, "PACKED")}
-                      className="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5"
+                      className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm shadow-purple-600/20 transition-all"
                     >
                       <Package className="w-4 h-4" />
                       <span>Mark All Lines Packed</span>
@@ -411,7 +411,7 @@ export default function AdminFulfillmentHub() {
                   {selectedOrder.status === "PACKED" && (
                     <button
                       onClick={() => handleAdvanceStatus(selectedOrder, "SHIPPED")}
-                      className="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5"
+                      className="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm shadow-cyan-600/20 transition-all"
                     >
                       <Truck className="w-4 h-4" />
                       <span>Dispatch to Delivery Driver</span>
@@ -421,11 +421,11 @@ export default function AdminFulfillmentHub() {
 
                 {/* Enhanced Bank Transfer Payment Slip Review Card */}
                 {selectedOrder.proofImageUrl && (
-                  <div className="mt-3 p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between gap-3">
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div
                         onClick={() => setPreviewZoomImage(selectedOrder.proofImageUrl!)}
-                        className="w-14 h-14 rounded-lg overflow-hidden border border-blue-500/40 bg-slate-900 cursor-pointer shrink-0 hover:scale-105 transition-transform"
+                        className="w-14 h-14 rounded-lg overflow-hidden border border-blue-300 bg-white cursor-pointer shrink-0 hover:scale-105 transition-transform"
                       >
                         <img
                           src={selectedOrder.proofImageUrl}
@@ -434,11 +434,11 @@ export default function AdminFulfillmentHub() {
                         />
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-white flex items-center gap-1">
-                          <FileCheck className="w-3.5 h-3.5 text-blue-400" />
+                        <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                          <FileCheck className="w-3.5 h-3.5 text-blue-600" />
                           <span>Wire Transfer Receipt Attached</span>
                         </div>
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-slate-500">
                           Target: {formatCurrency(selectedOrder.totalAmountCents)}
                         </span>
                       </div>
@@ -446,7 +446,7 @@ export default function AdminFulfillmentHub() {
 
                     <button
                       onClick={() => setPreviewZoomImage(selectedOrder.proofImageUrl!)}
-                      className="px-3 py-1.5 bg-blue-600/30 hover:bg-blue-600 text-blue-200 hover:text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors"
+                      className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-colors border border-blue-200"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>Zoom / Inspect</span>
@@ -456,32 +456,32 @@ export default function AdminFulfillmentHub() {
               </div>
 
               {/* Immutable Audit Log Trail (KargoHub.md Rule 4 & Section 5) */}
-              <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-xl space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-                  <History className="w-4 h-4 text-purple-400" />
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <History className="w-4 h-4 text-purple-600" />
                   <span>Immutable Audit Trail ({auditLogs.length} Events)</span>
                 </div>
 
                 <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                   {auditLogs.length === 0 ? (
-                    <div className="text-slate-500 text-xs py-2">No audit logs recorded yet.</div>
+                    <div className="text-slate-400 text-xs py-2">No audit logs recorded yet.</div>
                   ) : (
                     auditLogs.map((log) => (
                       <div
                         key={log.id}
-                        className="p-2.5 bg-slate-900/80 border border-slate-800/80 rounded-lg text-xs"
+                        className="p-2.5 bg-white border border-slate-200 rounded-lg text-xs shadow-xs"
                       >
                         <div className="flex items-center justify-between text-slate-400 text-[11px] mb-1">
-                          <span className="font-semibold text-slate-200">
+                          <span className="font-semibold text-slate-700">
                             {log.changedByName || "System"}
                           </span>
                           <span>{new Date(log.createdAt).toLocaleTimeString()}</span>
                         </div>
-                        <div className="text-white font-medium">
-                          Status &rarr; <span className="font-bold text-blue-300">{log.toStatus}</span>
+                        <div className="text-slate-800 font-medium">
+                          Status &rarr; <span className="font-bold text-blue-600">{log.toStatus}</span>
                         </div>
                         {log.reason && (
-                          <div className="text-[11px] text-slate-400 mt-0.5 italic">
+                          <div className="text-[11px] text-slate-500 mt-0.5 italic">
                             &quot;{log.reason}&quot;
                           </div>
                         )}
@@ -492,7 +492,7 @@ export default function AdminFulfillmentHub() {
               </div>
             </>
           ) : (
-            <div className="py-24 text-center text-slate-500 text-xs">
+            <div className="py-24 text-center text-slate-400 text-xs">
               Select an order from the master list to process fulfillment and view audit logs.
             </div>
           )}
@@ -513,17 +513,17 @@ export default function AdminFulfillmentHub() {
       {previewZoomImage && (
         <div
           onClick={() => setPreviewZoomImage(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md cursor-pointer animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm cursor-pointer animate-fade-in"
         >
-          <div className="relative max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-hidden">
-            <div className="flex justify-between items-center pb-2 mb-2 border-b border-slate-800 text-xs text-white font-bold">
+          <div className="relative max-w-2xl w-full bg-white border border-slate-200 rounded-2xl p-4 overflow-hidden shadow-2xl">
+            <div className="flex justify-between items-center pb-2 mb-2 border-b border-slate-200 text-xs text-slate-900 font-bold">
               <span>Inspect Wire Transfer Receipt Slip</span>
-              <span className="text-slate-400 font-normal">Click anywhere to close</span>
+              <span className="text-slate-500 font-normal">Click anywhere to close</span>
             </div>
             <img
               src={previewZoomImage}
               alt="Zoomed Payment Slip"
-              className="max-h-[75vh] w-full object-contain rounded-lg"
+              className="max-h-[75vh] w-full object-contain rounded-lg border border-slate-100"
             />
           </div>
         </div>
@@ -531,32 +531,32 @@ export default function AdminFulfillmentHub() {
 
       {/* Admin Cancellation Reason Modal */}
       {showCancelModal && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
               <span>Cancel Order #{selectedOrder.orderNumber}</span>
             </h3>
-            <p className="text-xs text-slate-300">
+            <p className="text-xs text-slate-600 leading-relaxed">
               Per KargoHub Section 4 Rule 3, Admin cancellations require a mandatory logged justification. Reserved inventory will be atomically released.
             </p>
             <textarea
               placeholder="Enter mandatory reason for cancellation (e.g. client requested, credit check failure)..."
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-red-500"
+              className="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-red-500 placeholder-slate-400"
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowCancelModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900"
               >
                 Dismiss
               </button>
               <button
                 onClick={handleAdminCancel}
                 disabled={!cancelReason.trim()}
-                className="px-4 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-40 text-white text-xs font-bold rounded-xl"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
               >
                 Confirm Cancellation
               </button>

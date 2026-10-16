@@ -111,33 +111,33 @@ export default function WarehouseView() {
   return (
     <div className="space-y-6">
       {notice && (
-        <div className="p-3 bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs font-semibold rounded-xl flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-2 shadow-xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>{notice}</span>
         </div>
       )}
 
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-white">Warehouse Pick & Pack Fulfillment</h2>
-          <p className="text-xs text-slate-400">
+          <h2 className="text-lg font-bold text-slate-900">Warehouse Pick & Pack Fulfillment</h2>
+          <p className="text-xs text-slate-500">
             Fulfill confirmed orders, record item checklists, and stage pallets for driver dispatch.
           </p>
         </div>
-        <div className="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/20">
+        <div className="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200">
           Queue: {orders.length} Active Orders
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Left: Orders Queue */}
-        <div className="w-full lg:w-1/3 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pb-2 border-b border-slate-800">
+        <div className="w-full lg:w-1/3 bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-xs">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 pb-2 border-b border-slate-200">
             Fulfillment Queue
           </h3>
 
           {orders.length === 0 ? (
-            <div className="py-12 text-center text-slate-500 text-xs">
+            <div className="py-12 text-center text-slate-400 text-xs">
               No orders waiting in warehouse queue.
             </div>
           ) : (
@@ -150,24 +150,24 @@ export default function WarehouseView() {
                     onClick={() => setSelectedOrder(ord)}
                     className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
                       isSelected
-                        ? "bg-amber-600/10 border-amber-500 shadow-md shadow-amber-500/10"
-                        : "bg-slate-950/50 border-slate-800 hover:border-slate-700"
+                        ? "bg-amber-50/70 border-amber-500 shadow-sm shadow-amber-500/10"
+                        : "bg-slate-50/60 border-slate-200 hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-xs font-bold text-white">
+                      <span className="font-mono text-xs font-bold text-slate-900">
                         #{ord.orderNumber}
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
                         {ord.status}
                       </span>
                     </div>
-                    <div className="text-xs text-slate-300 font-medium truncate">
+                    <div className="text-xs text-slate-800 font-medium truncate">
                       {ord.clientCompanyName}
                     </div>
-                    <div className="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+                    <div className="text-[11px] text-slate-500 mt-1 flex items-center justify-between">
                       <span>Delivery: {ord.requestedDeliveryDate || "Standard"}</span>
-                      <span className="font-mono text-blue-400">{ord.invoiceNumber}</span>
+                      <span className="font-mono text-blue-600 font-semibold">{ord.invoiceNumber}</span>
                     </div>
                   </div>
                 );
@@ -177,16 +177,16 @@ export default function WarehouseView() {
         </div>
 
         {/* Right: Picking Checklist & Dispatch Controls */}
-        <div className="flex-1 w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-6">
+        <div className="flex-1 w-full bg-white border border-slate-200 rounded-2xl p-6 space-y-6 shadow-xs">
           {selectedOrder ? (
             <>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                 <div>
-                  <h3 className="text-base font-bold text-white font-mono">
+                  <h3 className="text-base font-bold text-slate-900 font-mono">
                     Picking List for Order #{selectedOrder.orderNumber}
                   </h3>
-                  <p className="text-xs text-slate-400">
-                    Client: <strong>{selectedOrder.clientCompanyName}</strong> · Location: Central Warehouse (Bay 4)
+                  <p className="text-xs text-slate-500">
+                    Client: <strong className="text-slate-800">{selectedOrder.clientCompanyName}</strong> · Location: Central Warehouse (Bay 4)
                   </p>
                 </div>
 
@@ -195,7 +195,7 @@ export default function WarehouseView() {
                   {selectedOrder.status === "CONFIRMED" && (
                     <button
                       onClick={() => handleStartPicking(selectedOrder)}
-                      className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-amber-600/20"
+                      className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm shadow-amber-600/20 transition-all"
                     >
                       <ClipboardList className="w-4 h-4" />
                       <span>Start Physical Picking</span>
@@ -205,7 +205,7 @@ export default function WarehouseView() {
                   {selectedOrder.status === "PICKING" && (
                     <button
                       onClick={() => handleMarkPacked(selectedOrder)}
-                      className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-purple-600/20"
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm shadow-purple-600/20 transition-all"
                     >
                       <Package className="w-4 h-4" />
                       <span>Complete & Mark Packed</span>
@@ -215,7 +215,7 @@ export default function WarehouseView() {
                   {selectedOrder.status === "PACKED" && (
                     <button
                       onClick={() => handleDispatchToDriver(selectedOrder)}
-                      className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-cyan-600/20"
+                      className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm shadow-cyan-600/20 transition-all"
                     >
                       <Truck className="w-4 h-4" />
                       <span>Hand Off to Driver</span>
@@ -226,7 +226,7 @@ export default function WarehouseView() {
 
               {/* Picking Line Items Table */}
               <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   Physical Bin & Shelf Checklist
                 </h4>
 
@@ -244,30 +244,30 @@ export default function WarehouseView() {
                         onClick={() => togglePickItem(item.sku)}
                         className={`p-3.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                           isPicked
-                            ? "bg-emerald-950/20 border-emerald-500/40 text-emerald-200"
-                            : "bg-slate-950/60 border-slate-800 text-slate-200 hover:border-slate-700"
+                            ? "bg-emerald-50/80 border-emerald-300 text-emerald-900"
+                            : "bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300"
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           {isPicked ? (
-                            <CheckSquare className="w-5 h-5 text-emerald-400" />
+                            <CheckSquare className="w-5 h-5 text-emerald-600" />
                           ) : (
-                            <Square className="w-5 h-5 text-slate-500" />
+                            <Square className="w-5 h-5 text-slate-400" />
                           )}
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-mono text-xs font-bold text-blue-400">{item.sku}</span>
-                              <span className="text-[11px] text-amber-400 font-semibold bg-amber-500/10 px-2 py-0.5 rounded">
+                              <span className="font-mono text-xs font-bold text-blue-600">{item.sku}</span>
+                              <span className="text-[11px] text-amber-800 font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
                                 {item.loc}
                               </span>
                             </div>
-                            <div className="text-xs font-medium text-white mt-0.5">{item.name}</div>
+                            <div className="text-xs font-medium text-slate-900 mt-0.5">{item.name}</div>
                           </div>
                         </div>
 
                         <div className="text-right">
-                          <span className="text-xs font-bold text-white block">{item.qty}</span>
-                          <span className="text-[10px] text-slate-400">
+                          <span className="text-xs font-bold text-slate-900 block">{item.qty}</span>
+                          <span className="text-[10px] text-slate-500">
                             {isPicked ? "Picked & Verified" : "Pending Pick"}
                           </span>
                         </div>
@@ -279,14 +279,14 @@ export default function WarehouseView() {
 
               {/* Warehouse Staging Notes */}
               {selectedOrder.notes && (
-                <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl text-xs text-slate-300">
-                  <span className="font-bold text-slate-400 block mb-0.5">Client Shipping Instructions:</span>
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 block mb-0.5">Client Shipping Instructions:</span>
                   {selectedOrder.notes}
                 </div>
               )}
             </>
           ) : (
-            <div className="py-24 text-center text-slate-500 text-xs">
+            <div className="py-24 text-center text-slate-400 text-xs">
               Select an order from the queue to start picking.
             </div>
           )}

@@ -5,7 +5,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import PWARegistration from "@/components/pwa/PWARegistration";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "KargoHub — B2B Wholesale Ordering Platform",
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "KargoHub",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#020617",
+  themeColor: "#2563eb",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -36,9 +36,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full bg-slate-950 text-slate-100 antialiased dark">
+    <html lang="en" className="h-full bg-slate-50 text-slate-900 antialiased">
       <body
-        className={`${inter.className} min-h-full flex flex-col bg-slate-950 selection:bg-blue-600 selection:text-white`}
+        className={`${inter.className} min-h-full flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white`}
       >
         <AuthProvider>
           <CartProvider>

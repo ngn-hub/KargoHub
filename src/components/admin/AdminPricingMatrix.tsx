@@ -59,43 +59,43 @@ export default function AdminPricingMatrix() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold text-white">Tiered Wholesale Pricing Matrix</h2>
-        <p className="text-xs text-slate-400">
+        <h2 className="text-lg font-bold text-slate-900">Tiered Wholesale Pricing Matrix</h2>
+        <p className="text-xs text-slate-500">
           Strict precedence resolution: Client Custom Override &rarr; Tier Assigned Price &rarr; Base Wholesale Price.
         </p>
       </div>
 
       {/* Pricing Matrix Table */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800 font-bold">
+            <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider text-[10px] border-b border-slate-200 font-bold">
               <tr>
                 <th className="py-3.5 px-4">Product SKU & Name</th>
                 <th className="py-3.5 px-4">Base Wholesale</th>
                 {priceLists.map((pl) => (
                   <th key={pl.id} className="py-3.5 px-4">
-                    <div className="text-blue-300 font-bold">{pl.name}</div>
-                    <div className="text-[9px] text-slate-500 normal-case">{pl.description}</div>
+                    <div className="text-blue-700 font-bold">{pl.name}</div>
+                    <div className="text-[9px] text-slate-400 normal-case">{pl.description}</div>
                   </th>
                 ))}
                 <th className="py-3.5 px-4">Client Custom Override</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-slate-100">
               {products.map((p) => {
                 const override = overrides.find((o) => o.productId === p.id);
 
                 return (
-                  <tr key={p.id} className="hover:bg-slate-850/50 transition-colors">
+                  <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
                     {/* SKU & Name */}
                     <td className="py-3.5 px-4">
-                      <div className="font-mono text-xs font-bold text-blue-400">{p.sku}</div>
-                      <div className="font-medium text-white text-xs">{p.name}</div>
+                      <div className="font-mono text-xs font-bold text-blue-600">{p.sku}</div>
+                      <div className="font-medium text-slate-900 text-xs">{p.name}</div>
                     </td>
 
                     {/* Base Wholesale */}
-                    <td className="py-3.5 px-4 font-bold text-slate-300">
+                    <td className="py-3.5 px-4 font-bold text-slate-700">
                       {formatCurrency(p.basePriceCents)}
                     </td>
 
@@ -113,15 +113,15 @@ export default function AdminPricingMatrix() {
                         <td key={pl.id} className="py-3.5 px-4">
                           {item ? (
                             <div>
-                              <span className="font-bold text-white">
+                              <span className="font-bold text-slate-900">
                                 {formatCurrency(item.priceCents)}
                               </span>
-                              <span className="ml-1 text-[10px] text-blue-400 font-semibold">
+                              <span className="ml-1 text-[10px] text-blue-600 font-semibold">
                                 (-{discount}%)
                               </span>
                             </div>
                           ) : (
-                            <span className="text-slate-500">-</span>
+                            <span className="text-slate-400">-</span>
                           )}
                         </td>
                       );
@@ -130,12 +130,12 @@ export default function AdminPricingMatrix() {
                     {/* Custom Override Column */}
                     <td className="py-3.5 px-4">
                       {override ? (
-                        <span className="inline-flex items-center gap-1 font-bold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full text-[11px]">
-                          <Tag className="w-3 h-3" />
+                        <span className="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full text-[11px]">
+                          <Tag className="w-3 h-3 text-amber-600" />
                           Metro Supermarket: {formatCurrency(override.customPriceCents)}
                         </span>
                       ) : (
-                        <span className="text-slate-600 text-[11px]">Standard Tier Applies</span>
+                        <span className="text-slate-400 text-[11px]">Standard Tier Applies</span>
                       )}
                     </td>
                   </tr>
