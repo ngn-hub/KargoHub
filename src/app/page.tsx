@@ -14,10 +14,13 @@ import DriverDeliveryView from "@/components/driver/DriverDeliveryView";
 import { db } from "@/lib/firebase/config";
 import { collection, getDocs, limit, query } from "firebase/firestore";
 import { seedInitialDatabase } from "@/lib/services/seedService";
-import { Sparkles, Shield, Store, Truck, Warehouse as WarehouseIcon } from "lucide-react";
+import { Sparkles, Shield, Store, Truck, Warehouse as WarehouseIcon, ShoppingCart, ChevronRight } from "lucide-react";
+import { useCart } from "@/context/CartContext";
+import { formatCurrency } from "@/lib/utils/currency";
 
 export default function HomePage() {
   const { currentUser, currentClient } = useAuth();
+  const { totalItemsCount, totalCents } = useCart();
   const [activeTab, setActiveTab] = useState<string>("catalog");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
@@ -117,6 +120,39 @@ export default function HomePage() {
         onClose={() => setIsCartOpen(false)}
         onOrderSuccess={handleOrderSuccess}
       />
+
+      {/* Floating Bottom Cart Bar for Mobile Clients */}
+      {(currentUser.role === "client_owner" || currentUser.role === "client_staff") &&
+        activeTab === "catalog" &&
+        totalItemsCount > 0 &&
+        !isCartOpen && (
+          <aside
+            aria-label="Mobile cart checkout"
+            className="sm:hidden fixed bottom-4 left-4 right-4 z-40 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 p-3 rounded-2xl shadow-2xl shadow-blue-500/30 border border-blue-400/40 flex items-center justify-between text-white animate-in slide-in-from-bottom duration-300"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <ShoppingCart className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <div className="text-xs font-bold leading-tight">
+                  {totalItemsCount} {totalItemsCount === 1 ? "Case" : "Cases"} Selected
+                </div>
+                <div className="text-[11px] text-blue-100 font-mono font-medium">
+                  Subtotal: {formatCurrency(totalCents)}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="px-3.5 py-2 bg-white text-blue-700 font-bold text-xs rounded-xl shadow hover:bg-blue-50 transition-colors flex items-center gap-1 shrink-0"
+            >
+              <span>View Cart</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </aside>
+        )}
 
       {/* Global Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-400">

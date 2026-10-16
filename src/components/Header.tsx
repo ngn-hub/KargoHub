@@ -14,7 +14,8 @@ import {
   UserCheck,
   ChevronDown,
   Sparkles,
-  ClipboardList
+  ClipboardList,
+  Clock
 } from "lucide-react";
 import { seedInitialDatabase } from "@/lib/services/seedService";
 
@@ -190,57 +191,57 @@ export default function Header({ activeTab, setActiveTab, onOpenCart }: HeaderPr
             )}
           </nav>
 
-          {/* Right Action Controls: Persona Switcher, Cart, Seed DB */}
-          <div className="flex items-center gap-2.5">
-            {/* Quick Demo Database Seeder */}
-            <button
-              onClick={handleSeed}
-              disabled={seeding}
-              title="Populate demo catalog, inventory and pricing tiers"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg transition-all"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${seeding ? "animate-spin text-blue-400" : "text-slate-400"}`} />
-              <span className="hidden sm:inline">Reset / Seed Data</span>
-            </button>
+          {/* Right Action Controls: Cart, Persona Switcher, Seed DB */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {/* Cart Trigger (for client roles - given priority) */}
+            {(currentUser.role === "client_owner" || currentUser.role === "client_staff") && (
+              <button
+                onClick={onOpenCart}
+                className="relative flex items-center justify-center p-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30 transition-all shrink-0"
+                title="View Wholesale Cart"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                {totalItemsCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-amber-400 text-slate-950 text-[10px] font-black rounded-full flex items-center justify-center shadow-md">
+                    {totalItemsCount}
+                  </span>
+                )}
+              </button>
+            )}
 
-            {/* Persona Switcher Dropdown */}
+            {/* Persona Switcher Dropdown (Responsive width with truncation) */}
             <div className="relative">
               <select
                 aria-label="Switch Persona"
                 value={currentUser.id}
                 onChange={(e) => switchUser(e.target.value)}
-                className="appearance-none bg-slate-900 border border-slate-700 hover:border-slate-600 text-xs text-slate-200 py-1.5 pl-3 pr-7 rounded-lg cursor-pointer font-medium focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="appearance-none bg-slate-900 border border-slate-700 hover:border-slate-600 text-[11px] sm:text-xs text-slate-200 py-1.5 pl-2.5 pr-6 rounded-lg cursor-pointer font-medium max-w-[125px] sm:max-w-[195px] truncate focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 {allUsers.map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.role.toUpperCase()}: {u.name.split(" ")[0]} ({u.role.replace("_", " ")})
+                    {u.name.split(" ")[0]} ({u.role.replace("_", " ")})
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-2.5 pointer-events-none" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-1.5 top-2.5 pointer-events-none" />
             </div>
+
+            {/* Quick Demo Database Seeder (hidden on extra small screens) */}
+            <button
+              onClick={handleSeed}
+              disabled={seeding}
+              title="Populate demo catalog, inventory and pricing tiers"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg transition-all shrink-0"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${seeding ? "animate-spin text-blue-400" : "text-slate-400"}`} />
+              <span className="hidden md:inline">Reset / Seed Data</span>
+            </button>
 
             {/* Role Badge Indicator */}
             <div className={`hidden lg:flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border ${currentBadge.bg}`}>
               <RoleIcon className="w-3.5 h-3.5" />
               <span>{currentBadge.label}</span>
             </div>
-
-            {/* Cart Trigger (for client roles) */}
-            {(currentUser.role === "client_owner" || currentUser.role === "client_staff") && (
-              <button
-                onClick={onOpenCart}
-                className="relative flex items-center justify-center p-2 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/30 transition-all hover:scale-105"
-                title="View Wholesale Cart"
-              >
-                <ShoppingCart className="w-4 h-4" />
-                {totalItemsCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md animate-bounce">
-                    {totalItemsCount}
-                  </span>
-                )}
-              </button>
-            )}
           </div>
         </div>
 
@@ -250,15 +251,28 @@ export default function Header({ activeTab, setActiveTab, onOpenCart }: HeaderPr
             <>
               <button
                 onClick={() => setActiveTab("catalog")}
-                className={`py-1 px-3 rounded ${activeTab === "catalog" ? "text-blue-400 font-bold" : "text-slate-400"}`}
+                className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-all ${
+                  activeTab === "catalog" ? "bg-blue-600/20 text-blue-400 font-bold" : "text-slate-400"
+                }`}
               >
-                Catalog
+                <Package className="w-3.5 h-3.5" />
+                <span>Catalog</span>
               </button>
               <button
                 onClick={() => setActiveTab("my-orders")}
-                className={`py-1 px-3 rounded ${activeTab === "my-orders" ? "text-blue-400 font-bold" : "text-slate-400"}`}
+                className={`py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition-all ${
+                  activeTab === "my-orders" ? "bg-blue-600/20 text-blue-400 font-bold" : "text-slate-400"
+                }`}
               >
-                Orders & Reorder
+                <Clock className="w-3.5 h-3.5" />
+                <span>Orders</span>
+              </button>
+              <button
+                onClick={onOpenCart}
+                className="py-1.5 px-3 rounded-lg flex items-center gap-1.5 text-blue-300 font-semibold bg-blue-600/10 border border-blue-500/20"
+              >
+                <ShoppingCart className="w-3.5 h-3.5 text-blue-400" />
+                <span>Cart ({totalItemsCount})</span>
               </button>
             </>
           )}
