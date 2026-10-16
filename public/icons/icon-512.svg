@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="blueGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="emeraldAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background with subtle border -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <rect width="504" height="504" x="4" y="4" rx="124" fill="none" stroke="#1e293b" stroke-width="4"/>
+
+  <!-- Geometric Cargo Hexagon / Cube -->
+  <g transform="translate(256, 256) scale(1.1)">
+    <!-- Top Face (Blue glow) -->
+    <polygon points="0,-120 104,-60 0,0 -104,-60" fill="url(#blueGlow)" opacity="0.95"/>
+    
+    <!-- Left Face (Dark Indigo) -->
+    <polygon points="-104,-60 0,0 0,120 -104,60" fill="#1e3a8a" opacity="0.9"/>
+    
+    <!-- Right Face (Emerald / Cyan Delivery Accent) -->
+    <polygon points="0,0 104,-60 104,60 0,120" fill="url(#emeraldAccent)" opacity="0.85"/>
+
+    <!-- Subtle inner lines / tape seam -->
+    <line x1="0" y1="0" x2="0" y2="120" stroke="#020617" stroke-width="4" stroke-opacity="0.6"/>
+    <line x1="0" y1="0" x2="-104" y2="-60" stroke="#020617" stroke-width="4" stroke-opacity="0.4"/>
+    <line x1="0" y1="0" x2="104" y2="-60" stroke="#020617" stroke-width="4" stroke-opacity="0.4"/>
+
+    <!-- Center Hub Dot -->
+    <circle cx="0" cy="0" r="14" fill="#ffffff" filter="drop-shadow(0px 0px 8px #38bdf8)"/>
+  </g>
+</svg>

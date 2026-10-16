@@ -17,14 +17,27 @@ import {
   RotateCcw,
   Navigation,
   ShieldCheck,
-  Building
+  Building,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+  ExternalLink
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 import { getStoredOrders, saveStoredOrders } from "@/lib/services/storeSync";
+import {
+  enqueueOfflineDelivery,
+  getPendingDeliveries,
+  syncPendingDeliveries
+} from "@/lib/services/offlineSyncService";
 
 export default function DriverDeliveryView() {
   const { currentUser } = useAuth();
+  const [isOnline, setIsOnline] = useState(true);
+  const [pendingQueueCount, setPendingQueueCount] = useState(0);
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
+
   const [orders, setOrders] = useState<Order[]>(() => {
     return getStoredOrders().filter((o) => o.status === "SHIPPED");
   });
@@ -45,6 +58,29 @@ export default function DriverDeliveryView() {
   const [hasSignature, setHasSignature] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsOnline(navigator.onLine);
+      setPendingQueueCount(getPendingDeliveries().length);
+    }
+
+    const handleOnline = async () => {
+      setIsOnline(true);
+      const res = await syncPendingDeliveries();
+      setPendingQueueCount(res.remainingCount);
+      if (res.syncedCount > 0) {
+        setNotice(`Auto-synced ${res.syncedCount} offline delivery record(s) to cloud!`);
+        setTimeout(() => setNotice(null), 4000);
+      }
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      setPendingQueueCount(getPendingDeliveries().length);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
     try {
       // Orders in transit for drivers (SHIPPED)
       const q = query(collection(db, "orders"), where("status", "==", "SHIPPED"));
@@ -73,11 +109,32 @@ export default function DriverDeliveryView() {
           }
         }
       });
-      return () => unsub();
+
+      return () => {
+        unsub();
+        window.removeEventListener("online", handleOnline);
+        window.removeEventListener("offline", handleOffline);
+      };
     } catch {
-      // offline fallback
+      return () => {
+        window.removeEventListener("online", handleOnline);
+        window.removeEventListener("offline", handleOffline);
+      };
     }
   }, [activeOrder?.id]);
+
+  const handleManualSyncNow = async () => {
+    if (!isOnline) {
+      alert("Device is currently offline. Connect to mobile data or Wi-Fi to sync.");
+      return;
+    }
+    setIsManualSyncing(true);
+    const res = await syncPendingDeliveries();
+    setIsManualSyncing(false);
+    setPendingQueueCount(res.remainingCount);
+    setNotice(`Sync complete: ${res.syncedCount} deliveries synced to cloud.`);
+    setTimeout(() => setNotice(null), 4000);
+  };
 
   // Canvas drawing handlers (mouse + touch)
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
@@ -126,7 +183,7 @@ export default function DriverDeliveryView() {
     setHasSignature(false);
   };
 
-  // Complete Delivery Action (KargoHub.md Acceptance Criteria #5)
+  // Complete Delivery Action (KargoHub.md Acceptance Criteria #5) with Offline Fallback
   const handleCompleteDelivery = async () => {
     if (!activeOrder) return;
     if (!hasSignature) {
@@ -141,6 +198,49 @@ export default function DriverDeliveryView() {
     const collectedCents =
       activeOrder.paymentMethod === "cod" ? parseDollarsToCents(codAmount) : undefined;
 
+    const isDeviceOnline = typeof navigator !== "undefined" ? navigator.onLine : true;
+
+    if (!isDeviceOnline) {
+      // Offline fallback: Queue locally
+      enqueueOfflineDelivery({
+        orderId: activeOrder.id,
+        orderNumber: activeOrder.orderNumber,
+        deliveredAt: new Date().toISOString(),
+        signatureUrl: signatureDataUrl || "",
+        codCollectedCents: collectedCents,
+        driverUserId: currentUser.id,
+        driverName: currentUser.name
+      });
+
+      // Update local storage so driver view advances
+      const stored = getStoredOrders().map((o) => {
+        if (o.id === activeOrder.id) {
+          return {
+            ...o,
+            status: "DELIVERED" as const,
+            deliveryReceiptNumber: `DR-2026-${String(o.id).slice(-4)}`,
+            driverSignatureUrl: signatureDataUrl,
+            codCollectedCents: collectedCents,
+            paymentStatus: collectedCents ? ("paid" as const) : o.paymentStatus
+          };
+        }
+        return o;
+      });
+      saveStoredOrders(stored);
+
+      setOrders((prev) => prev.filter((o) => o.id !== activeOrder.id));
+      setActiveOrder(null);
+      setPendingQueueCount(getPendingDeliveries().length);
+      setCompleting(false);
+      clearSignature();
+
+      confetti({ particleCount: 70, spread: 60, origin: { y: 0.5 } });
+      setNotice(`Saved OFFLINE on device! Order #${activeOrder.orderNumber} signature cached. Will auto-sync when online.`);
+      setTimeout(() => setNotice(null), 5000);
+      return;
+    }
+
+    // Online execution
     const res = await transitionOrderStatus({
       orderId: activeOrder.id,
       toStatus: "DELIVERED",
@@ -156,9 +256,26 @@ export default function DriverDeliveryView() {
       confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 } });
       setNotice(`Order #${activeOrder.orderNumber} successfully marked as DELIVERED!`);
       clearSignature();
+      setOrders((prev) => prev.filter((o) => o.id !== activeOrder.id));
+      setActiveOrder(null);
       setTimeout(() => setNotice(null), 4000);
     } else {
-      alert(res.message || "Failed to finalize delivery.");
+      // If network failure during request, fallback to queue
+      enqueueOfflineDelivery({
+        orderId: activeOrder.id,
+        orderNumber: activeOrder.orderNumber,
+        deliveredAt: new Date().toISOString(),
+        signatureUrl: signatureDataUrl || "",
+        codCollectedCents: collectedCents,
+        driverUserId: currentUser.id,
+        driverName: currentUser.name
+      });
+      setPendingQueueCount(getPendingDeliveries().length);
+      setNotice("Network glitch: delivery signature cached offline on device.");
+      clearSignature();
+      setOrders((prev) => prev.filter((o) => o.id !== activeOrder.id));
+      setActiveOrder(null);
+      setTimeout(() => setNotice(null), 4000);
     }
   };
 
@@ -172,7 +289,7 @@ export default function DriverDeliveryView() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Truck className="w-5 h-5 text-emerald-400" />
@@ -182,8 +299,39 @@ export default function DriverDeliveryView() {
             Offline-resilient touch interface for dock receipt, COD collection, and digital signing.
           </p>
         </div>
-        <div className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-          Route: {orders.length} Deliveries Pending
+
+        <div className="flex items-center gap-2">
+          {/* Online status indicator */}
+          <div
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+              isOnline
+                ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
+                : "bg-amber-950/60 border-amber-500/40 text-amber-300 animate-pulse"
+            }`}
+          >
+            {isOnline ? (
+              <Wifi className="w-3 h-3 text-emerald-400" />
+            ) : (
+              <WifiOff className="w-3 h-3 text-amber-400" />
+            )}
+            <span>{isOnline ? "Online Sync Active" : "Offline Mode (Local Cache)"}</span>
+          </div>
+
+          {pendingQueueCount > 0 && (
+            <button
+              onClick={handleManualSyncNow}
+              disabled={isManualSyncing || !isOnline}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50 transition-colors shadow"
+              title="Sync pending deliveries to Cloud Firestore"
+            >
+              <RefreshCw className={`w-3 h-3 ${isManualSyncing ? "animate-spin" : ""}`} />
+              <span>Sync ({pendingQueueCount})</span>
+            </button>
+          )}
+
+          <div className="text-xs font-semibold px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+            {orders.length} Stops
+          </div>
         </div>
       </div>
 
@@ -257,6 +405,23 @@ export default function DriverDeliveryView() {
                   <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
                     <Phone className="w-3.5 h-3.5 text-slate-400" />
                     <span>+1 (555) 349-8812 (Receiving Desk)</span>
+                  </div>
+
+                  {/* 1-Tap GPS Launch */}
+                  <div className="mt-2.5">
+                    <button
+                      onClick={() => {
+                        const destination = encodeURIComponent(
+                          `${activeOrder.clientCompanyName}, 4800 Industrial Blvd, Bay 4, Logistics City`
+                        );
+                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, "_blank");
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-[11px] font-semibold rounded-lg border border-slate-700 transition-colors shadow-sm"
+                    >
+                      <Navigation className="w-3 h-3 text-emerald-400" />
+                      <span>Launch GPS Directions</span>
+                      <ExternalLink className="w-2.5 h-2.5 opacity-60 ml-0.5" />
+                    </button>
                   </div>
                 </div>
 
