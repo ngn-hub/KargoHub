@@ -28,6 +28,7 @@ import {
   Trash2
 } from "lucide-react";
 import { getStoredOrders, saveStoredOrders } from "@/lib/services/storeSync";
+import { compressPaymentSlip } from "@/lib/utils/imageCompressor";
 
 export default function OrderHistoryView() {
   const { currentClient, currentUser } = useAuth();
@@ -41,8 +42,10 @@ export default function OrderHistoryView() {
   // State for Document Modal
   const [activeDocType, setActiveDocType] = useState<"SO" | "INV" | "DR" | null>(null);
 
-  // File upload state
+  // File upload state & bank reference
   const [receiptImageFile, setReceiptImageFile] = useState<string | null>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
+  const [bankRefInput, setBankRefInput] = useState("");
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
   const [previewZoomImage, setPreviewZoomImage] = useState<string | null>(null);
@@ -98,16 +101,20 @@ export default function OrderHistoryView() {
     }
   };
 
-  // Handle local file selection for payment proof
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle local file selection for payment proof with canvas compression
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setReceiptImageFile(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    try {
+      setIsCompressing(true);
+      const compressed = await compressPaymentSlip(file);
+      setReceiptImageFile(compressed);
+    } catch (err) {
+      console.error("Failed to compress image", err);
+    } finally {
+      setIsCompressing(false);
+    }
   };
 
   // Submit proof of payment
@@ -115,19 +122,25 @@ export default function OrderHistoryView() {
     if (!receiptImageFile) return;
     setUploadingReceipt(true);
 
+    const refText = bankRefInput.trim();
+    const reasonText = refText
+      ? `Wire transfer receipt uploaded. Bank Ref: ${refText}`
+      : "Wire transfer payment receipt uploaded by client.";
+
     const res = await transitionOrderStatus({
       orderId,
       toStatus: "PLACED",
       changedByUserId: currentUser.id,
       changedByName: currentUser.email,
       proofImageUrl: receiptImageFile,
-      reason: "Wire transfer payment receipt uploaded by client."
+      reason: reasonText
     });
 
     setUploadingReceipt(false);
     if (res.success) {
       setActionNotice("Receipt submitted! Admin will verify and confirm your order.");
       setReceiptImageFile(null);
+      setBankRefInput("");
       setTimeout(() => setActionNotice(null), 4000);
     }
   };
@@ -467,43 +480,61 @@ export default function OrderHistoryView() {
                           type="file"
                           accept="image/*"
                           onChange={handleFileChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          disabled={isCompressing || uploadingReceipt}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                         />
                         <UploadCloud className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                         <div className="text-xs font-bold text-white">
-                          Click or drag wire transfer screenshot / slip here
+                          {isCompressing
+                            ? "Optimizing and compressing receipt..."
+                            : "Click or drag wire transfer screenshot / slip here"}
                         </div>
                         <p className="text-[10px] text-slate-400 mt-1">
                           Supports PNG, JPEG, WebP (Camera photos or banking app screenshots)
                         </p>
                       </div>
 
-                      {/* Staged file preview */}
+                      {/* Staged file preview & Bank Reference input */}
                       {receiptImageFile && (
-                        <div className="p-3 bg-slate-950/80 border border-blue-500/40 rounded-xl flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={receiptImageFile}
-                              alt="Staged Preview"
-                              className="w-12 h-12 rounded object-cover border border-slate-700"
-                            />
-                            <div className="text-xs">
-                              <span className="font-semibold text-white block">Selected Image Ready</span>
-                              <span className="text-[10px] text-emerald-400">Ready to submit to accounting</span>
+                        <div className="p-3.5 bg-slate-950/90 border border-blue-500/40 rounded-xl space-y-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={receiptImageFile}
+                                alt="Staged Preview"
+                                className="w-12 h-12 rounded object-cover border border-slate-700 shadow"
+                              />
+                              <div className="text-xs">
+                                <span className="font-semibold text-white block">Slip Ready</span>
+                                <span className="text-[10px] text-emerald-400">Compressed & ready for accounting</span>
+                              </div>
                             </div>
-                          </div>
 
-                          <div className="flex items-center gap-2">
                             <button
-                              onClick={() => setReceiptImageFile(null)}
-                              className="p-1.5 text-slate-400 hover:text-red-400"
+                              onClick={() => {
+                                setReceiptImageFile(null);
+                                setBankRefInput("");
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-red-400 rounded-lg hover:bg-slate-800 transition-colors"
+                              title="Discard"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
+                          </div>
+
+                          {/* Reference input */}
+                          <div className="flex flex-col sm:flex-row items-center gap-2">
+                            <input
+                              type="text"
+                              value={bankRefInput}
+                              onChange={(e) => setBankRefInput(e.target.value)}
+                              placeholder="Transaction Ref / Check # (e.g. TRX-9042)"
+                              className="w-full sm:flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                            />
                             <button
                               onClick={() => handleSubmitProof(selectedOrder.id)}
-                              disabled={uploadingReceipt}
-                              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg shadow-md flex items-center gap-1.5"
+                              disabled={uploadingReceipt || isCompressing}
+                              className="w-full sm:w-auto px-4 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-md flex items-center justify-center gap-1.5 whitespace-nowrap transition-colors"
                             >
                               {uploadingReceipt ? "Submitting..." : "Confirm & Send Proof"}
                             </button>
