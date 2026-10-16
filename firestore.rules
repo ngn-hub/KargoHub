@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public read/write during development and testing
+    // Replace with role-based claims before final public launch
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
